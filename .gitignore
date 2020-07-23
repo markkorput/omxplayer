@@ -7,3 +7,7 @@ ffmpeg
 help.h
 keys.h
 patch.flag
+MAN
+omxplayer-dist
+version.h
+omxplayer.1
