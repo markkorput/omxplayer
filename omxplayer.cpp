@@ -115,6 +115,9 @@ bool              m_has_audio           = false;
 bool              m_has_subtitle        = false;
 bool              m_gen_log             = false;
 bool              m_loop                = false;
+bool              m_muted               = false;
+long              m_pre_mute_volume     = 0;
+
 
 enum{ERROR=-1,SUCCESS,ONEBYTE};
 
@@ -1354,31 +1357,44 @@ int main(int argc, char *argv[])
         }
         break;
       case KeyConfig::ACTION_NEXT_SUBTITLE:
-        if(m_has_subtitle)
-        {
-          if(m_player_subtitles.GetUseExternalSubtitles())
-          {
-            if(m_omx_reader.SubtitleStreamCount())
-            {
-              assert(m_player_subtitles.GetActiveStream() == 0);
-              DISPLAY_TEXT_SHORT("Subtitle stream: 1");
-              m_player_subtitles.SetUseExternalSubtitles(false);
-            }
-          }
-          else
-          {
-            auto new_index = m_player_subtitles.GetActiveStream()+1;
-            if(new_index < (size_t) m_omx_reader.SubtitleStreamCount())
-            {
-              DISPLAY_TEXT_SHORT(strprintf("Subtitle stream: %d", new_index+1));
-              m_player_subtitles.SetActiveStream(new_index);
-            }
-          }
+        m_muted = !m_muted;
+        m_player_audio.SetMute(m_muted);
 
-          m_player_subtitles.SetVisible(true);
-          PrintSubtitleInfo();
+        if (m_muted) {
+          printf("MUTED");
+        } else {
+          m_Volume = m_pre_mute_volume;
+          m_player_audio.SetVolume(pow(10, m_Volume / 2000.0));
+          DISPLAY_TEXT_SHORT(strprintf("Volume: %.2f dB",
+          m_Volume / 100.0f));
+          printf("Unmuted, Current Volume: %.2fdB\n", m_Volume / 100.0f);
         }
-        break;
+
+        // if(m_has_subtitle)
+        // {
+        //   if(m_player_subtitles.GetUseExternalSubtitles())
+        //   {
+        //     if(m_omx_reader.SubtitleStreamCount())
+        //     {
+        //       assert(m_player_subtitles.GetActiveStream() == 0);
+        //       DISPLAY_TEXT_SHORT("Subtitle stream: 1");
+        //       m_player_subtitles.SetUseExternalSubtitles(false);
+        //     }
+        //   }
+        //   else
+        //   {
+        //     auto new_index = m_player_subtitles.GetActiveStream()+1;
+        //     if(new_index < (size_t) m_omx_reader.SubtitleStreamCount())
+        //     {
+        //       DISPLAY_TEXT_SHORT(strprintf("Subtitle stream: %d", new_index+1));
+        //       m_player_subtitles.SetActiveStream(new_index);
+        //     }
+        //   }
+
+        //   m_player_subtitles.SetVisible(true);
+        //   PrintSubtitleInfo();
+        // }
+        // break;
       case KeyConfig::ACTION_TOGGLE_SUBTITLE:
         if(m_has_subtitle)
         {
@@ -1523,14 +1539,26 @@ int main(int argc, char *argv[])
         }
         break;
       case KeyConfig::ACTION_DECREASE_VOLUME:
-        m_Volume -= 300;
+        if (m_muted) {
+          m_Volume = m_pre_mute_volume - 300;
+          m_muted = false;
+          m_player_audio.SetMute(m_muted);
+        } else {
+          m_Volume -= 300;
+        }
         m_player_audio.SetVolume(pow(10, m_Volume / 2000.0));
         DISPLAY_TEXT_SHORT(strprintf("Volume: %.2f dB",
           m_Volume / 100.0f));
         printf("Current Volume: %.2fdB\n", m_Volume / 100.0f);
         break;
       case KeyConfig::ACTION_INCREASE_VOLUME:
-        m_Volume += 300;
+        if (m_muted) {
+          m_Volume = m_pre_mute_volume - 300;
+          m_muted = false;
+          m_player_audio.SetMute(m_muted);
+        } else {
+          m_Volume += 300;
+        }
         m_player_audio.SetVolume(pow(10, m_Volume / 2000.0));
         DISPLAY_TEXT_SHORT(strprintf("Volume: %.2f dB",
           m_Volume / 100.0f));
