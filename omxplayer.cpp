@@ -1332,44 +1332,59 @@ int main(int argc, char *argv[])
         }
         break;
       case KeyConfig::ACTION_PREVIOUS_SUBTITLE:
-        if(m_has_subtitle)
-        {
-          if(!m_player_subtitles.GetUseExternalSubtitles())
-          {
-            if (m_player_subtitles.GetActiveStream() == 0)
-            {
-              if(m_has_external_subtitles)
-              {
-                DISPLAY_TEXT_SHORT("Subtitle file:\n" + m_external_subtitles_path);
-                m_player_subtitles.SetUseExternalSubtitles(true);
-              }
-            }
-            else
-            {
-              auto new_index = m_player_subtitles.GetActiveStream()-1;
-              DISPLAY_TEXT_SHORT(strprintf("Subtitle stream: %d", new_index+1));
-              m_player_subtitles.SetActiveStream(new_index);
-            }
-          }
-
-          m_player_subtitles.SetVisible(true);
-          PrintSubtitleInfo();
-        }
-        break;
-      case KeyConfig::ACTION_NEXT_SUBTITLE:
-        m_muted = !m_muted;
-        m_player_audio.SetMute(m_muted);
-
         if (m_muted) {
-          printf("MUTED\n");
-          m_pre_mute_volume = m_Volume;
-        } else {
+          m_muted = false;
+          m_player_audio.SetMute(m_muted);      
+
           m_Volume = m_pre_mute_volume;
           m_player_audio.SetVolume(pow(10, m_Volume / 2000.0));
           DISPLAY_TEXT_SHORT(strprintf("Volume: %.2f dB",
           m_Volume / 100.0f));
           printf("Unmuted, Current Volume: %.2fdB\n", m_Volume / 100.0f);
         }
+        break;
+        // if(m_has_subtitle)
+        // {
+        //   if(!m_player_subtitles.GetUseExternalSubtitles())
+        //   {
+        //     if (m_player_subtitles.GetActiveStream() == 0)
+        //     {
+        //       if(m_has_external_subtitles)
+        //       {
+        //         DISPLAY_TEXT_SHORT("Subtitle file:\n" + m_external_subtitles_path);
+        //         m_player_subtitles.SetUseExternalSubtitles(true);
+        //       }
+        //     }
+        //     else
+        //     {
+        //       auto new_index = m_player_subtitles.GetActiveStream()-1;
+        //       DISPLAY_TEXT_SHORT(strprintf("Subtitle stream: %d", new_index+1));
+        //       m_player_subtitles.SetActiveStream(new_index);
+        //     }
+        //   }
+
+        //   m_player_subtitles.SetVisible(true);
+        //   PrintSubtitleInfo();
+        // }
+        // break;
+      case KeyConfig::ACTION_NEXT_SUBTITLE:
+        // m_muted = !m_muted;
+        if (!m_muted) {
+          m_muted = true;
+          m_player_audio.SetMute(m_muted);      
+
+          // if (m_muted) {
+            printf("MUTED\n");
+            m_pre_mute_volume = m_Volume;
+          // } else {
+          //   m_Volume = m_pre_mute_volume;
+          //   m_player_audio.SetVolume(pow(10, m_Volume / 2000.0));
+          //   DISPLAY_TEXT_SHORT(strprintf("Volume: %.2f dB",
+          //   m_Volume / 100.0f));
+          //   printf("Unmuted, Current Volume: %.2fdB\n", m_Volume / 100.0f);
+          // }
+        }
+        break;
 
         // if(m_has_subtitle)
         // {
