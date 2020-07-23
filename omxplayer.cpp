@@ -1554,7 +1554,7 @@ int main(int argc, char *argv[])
         break;
       case KeyConfig::ACTION_INCREASE_VOLUME:
         if (m_muted) {
-          m_Volume = m_pre_mute_volume - 300;
+          m_Volume = m_pre_mute_volume + 300;
           m_muted = false;
           m_player_audio.SetMute(m_muted);
         } else {
