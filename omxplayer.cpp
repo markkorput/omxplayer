@@ -1362,6 +1362,7 @@ int main(int argc, char *argv[])
 
         if (m_muted) {
           printf("MUTED");
+          m_pre_mute_volume = m_Volume;
         } else {
           m_Volume = m_pre_mute_volume;
           m_player_audio.SetVolume(pow(10, m_Volume / 2000.0));
